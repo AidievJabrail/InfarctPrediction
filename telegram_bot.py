@@ -9,14 +9,9 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder
 from typing import List, Tuple
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
 from aiohttp import web
-
-# Конфигурация
-class Config:
-    TOKEN = "8395244216:AAH_4PA0oX1tePj60oom5y2T1EZ5iS6SwDA"
+from config import TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_PORT, DOMAIN, MODEL_API_PORT
 
 
-
-# Настройка логгирования
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -25,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 
-bot = Bot(token=Config.TOKEN)
+bot = Bot(token=TELEGRAM_BOT_TOKEN)
 dp = Dispatcher()
 
 QUESTIONS = {
@@ -90,43 +85,6 @@ class Form(StatesGroup):
     hypertension = State()
     diabetes = State()
 
-def save_prediction_to_db(user_id: int, user_data: dict, prediction_result: int):
-    conn = sqlite3.connect('/root/Project/telegram_bot/logger.db')
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-    INSERT INTO user_predictions (
-        user_id, age, height, weight, gender, angina, stroke, 
-        health_status, cholesterol, cigarettes, marital_status, 
-        employment, copd, personal_doctor, depression, 
-        walking_difficulty, last_checkup, hypertension, diabetes, 
-        model_prediction
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ''', (
-        user_id,
-        user_data.get('age'),
-        user_data.get('height'),
-        user_data.get('weight'),
-        user_data.get('gender'),
-        user_data.get('angina'),
-        user_data.get('stroke'),
-        user_data.get('health_status'),
-        user_data.get('cholesterol'),
-        user_data.get('cigarettes'),
-        user_data.get('marital_status'),
-        user_data.get('employment'),
-        user_data.get('copd'),
-        user_data.get('personal_doctor'),
-        user_data.get('depression'),
-        user_data.get('walking_difficulty'),
-        user_data.get('last_checkup'),
-        user_data.get('hypertension'),
-        user_data.get('diabetes'),
-        prediction_result
-    ))
-    
-    conn.commit()
-    conn.close()
 
 async def create_keyboard(options: List[Tuple[str, int]]) -> InlineKeyboardBuilder:
     builder = InlineKeyboardBuilder()
@@ -247,7 +205,7 @@ async def show_results(message: types.Message, state: FSMContext):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                "http://localhost:8000/predict",
+                "http://localhost:{MODEL_API_PORT}/predict",
                 json=data,
                 timeout=5.0
             ) as response:
@@ -256,16 +214,7 @@ async def show_results(message: types.Message, state: FSMContext):
                     result = await response.json()
                     prediction_result = result.get('prediction', 0)
                     
-                    # Сохраняем данные в базу
-                    try:
-                        save_prediction_to_db(
-                            user_id=message.from_user.id,
-                            user_data=data,
-                            prediction_result=prediction_result
-                        )
-                        logger.info(f"Данные пользователя {message.from_user.id} сохранены в БД")
-                    except Exception as db_error:
-                        logger.error(f"Ошибка сохранения в БД: {db_error}")
+                    
                     
                     if prediction_result == 1:
                         await message.answer("⚠️ Есть риск инфаркта. Рекомендуем обратиться к врачу для полного обследования.")
@@ -283,30 +232,9 @@ async def show_results(message: types.Message, state: FSMContext):
         await message.answer("Сервис временно недоступен. Попробуйте позже.")
 
 
-WEB_SERVER_HOST = 'localhost'  
-WEB_SERVER_PORT = 8443
 
-async def main():
-    DOMAIN = "makemlbehappy.ru"  # Замените на ваш домен или IP
-    
-    webhook_url = f"https://{DOMAIN}/webhook/{Config.TOKEN}"
-    
-    # Запускаем сервер на localhost
-    app = web.Application()
-    SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=f"/webhook/{Config.TOKEN}")
-    
-    runner = web.AppRunner(app)
-    await runner.setup()
-    site = web.TCPSite(runner, 'localhost', 8443) 
-    await site.start()
-    
-    logger.info(f"Сервер запущен на localhost:8443")
-    
-    # Устанавливаем webhook на внешний URL
-    await bot.set_webhook(webhook_url)
-    logger.info(f"Webhook установлен: {webhook_url}")
-    
-    await asyncio.Event().wait()
+async def main(): 
+    await dp.start_polling(bot)
 
 if __name__ == "__main__":
     import asyncio
