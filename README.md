@@ -13,5 +13,4 @@
 
 1. Клонировать репозиторий:
 ```bash
-git clone https://github.com/your-username/heart-attack-prediction-bot.git
-cd heart-attack-prediction-bot
+git clone https://github.com/AidievJabrail/InfarctPrediction.git
