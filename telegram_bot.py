@@ -7,9 +7,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from typing import List, Tuple
-from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
-from aiohttp import web
-from config import TELEGRAM_BOT_TOKEN, TELEGRAM_BOT_PORT, DOMAIN, MODEL_API_PORT
+
+from config import TELEGRAM_BOT_TOKEN,  MODEL_API_PORT
 
 
 logging.basicConfig(

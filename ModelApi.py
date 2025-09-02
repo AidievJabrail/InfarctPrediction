@@ -4,7 +4,7 @@ from catboost import CatBoostClassifier
 import sqlite3
 import numpy as np
 import logging
-from config import MODEL_API_PORT, MODEL_PATH
+from config import MODEL_API_PORT, MODEL_PATH, DATABASE_PATH
 
 
 logging.basicConfig(level=logging.INFO)
@@ -62,36 +62,36 @@ FEATURE_ORDER = [
 ]
 
 def save_prediction_to_db(user_data: dict, prediction_result: int):
-    conn = sqlite3.connect('logger.db')
+    conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
     
     cursor.execute('''
-        INSERT INTO user_predictions (
-            user_id, age, height, weight, gender, angina, stroke, 
+        INSERT INTO predictions (
+            timestamp, age, height, weight, gender, angina, stroke, 
             health_status, cholesterol, cigarettes, marital_status, 
             employment, copd, personal_doctor, depression, 
             walking_difficulty, last_checkup, hypertension, diabetes, 
             model_prediction
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (CURRENT_TIMESTAMP, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ''', (
-            user_data.get('age'),
-            user_data.get('height'),
-            user_data.get('weight'),
-            user_data.get('gender'),
-            user_data.get('angina'),
-            user_data.get('stroke'),
-            user_data.get('health_status'),
-            user_data.get('cholesterol'),
-            user_data.get('cigarettes'),
-            user_data.get('marital_status'),
-            user_data.get('employment'),
-            user_data.get('copd'),
-            user_data.get('personal_doctor'),
-            user_data.get('depression'),
-            user_data.get('walking_difficulty'),
-            user_data.get('last_checkup'),
-            user_data.get('hypertension'),
-            user_data.get('diabetes'),
+            user_data.age,
+            user_data.height,
+            user_data.weight,
+            user_data.gender,
+            user_data.angina,
+            user_data.stroke,
+            user_data.health_status,
+            user_data.cholesterol,
+            user_data.cigarettes,
+            user_data.marital_status,
+            user_data.employment,
+            user_data.copd,
+            user_data.personal_doctor,
+            user_data.depression,
+            user_data.walking_difficulty,
+            user_data.last_checkup,
+            user_data.hypertension,
+            user_data.diabetes,
             prediction_result
         ))
     
@@ -107,21 +107,18 @@ async def predict(data: HeartData):
         input_data = np.array([getattr(data, feature) for feature in FEATURE_ORDER])
         prediction = model.predict(input_data)
         try:
-            save_prediction_to_db(
-            user_data=data,
-            prediction_result=prediction
-            )
+            save_prediction_to_db(user_data=data,prediction_result=prediction)
             logger.info(f"Успешное сохранение в БД")
         except Exception as db_error:
             logger.error(f"Ошибка сохранения в БД: {db_error}")
-                    
         return {
-            "prediction": int(prediction)
+            "predict": int(prediction)
         }
-        
     except Exception as e:
         logger.error(f"Prediction error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
+
+    
 
 if __name__ == "__main__":
     import uvicorn
