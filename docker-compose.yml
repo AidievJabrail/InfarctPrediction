@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  ml-api:
+    build: .
+    container_name: ml-api-container
+    ports:
+      - "8000:8000"
+    command: python model_api.py
+    volumes:
+      - .:/app
+
+  telegram-bot:
+    build: .
+    container_name: telegram-bot-container
+    depends_on:
+      - ml-api
+    command: python telegram_bot.py
+    volumes:
+      - .:/app

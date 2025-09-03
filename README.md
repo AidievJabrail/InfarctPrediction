@@ -1,4 +1,4 @@
-# Heart Attack Prediction Bot
+# Heart  Prediction Bot
 
 Проект для предсказания риска инфаркта на основе факторов риска с использованием CatBoost и Telegram бота. 
 Готовый телеграм-бот можете найти в телеграмме по ссылку - @heartcorbot. Как обучал модель можете посмотреть по ссылке https://www.kaggle.com/code/jabr1one/ml-rus или 
