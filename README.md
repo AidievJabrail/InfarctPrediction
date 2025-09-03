@@ -15,3 +15,6 @@ https://www.kaggle.com/code/jabr1one/predicting-infarct-ml-models-feature-analys
 1. Клонировать репозиторий:
 ```bash
 git clone https://github.com/AidievJabrail/InfarctPrediction.git
+
+
+## Нужная версия python - 3.10.18
