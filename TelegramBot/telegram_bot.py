@@ -6,8 +6,14 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 from typing import List, Tuple
+from aiogram.webhook.aiohttp_server import SimpleRequestHandler, setup_application
+from aiohttp import web
+import os
 
-from config import TELEGRAM_BOT_TOKEN,  MODEL_API_PORT
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+MODEL_API_PORT= int(os.getenv('MODEL_API_PORT'))
+TELEGRAM_BOT_PORT= int(os.getenv('TELEGRAM_BOT_PORT'))
+DOMAIN=os.getenv('DOMAIN')
 
 
 logging.basicConfig(
@@ -203,7 +209,7 @@ async def show_results(message: types.Message, state: FSMContext):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(
-                "http://localhost:{MODEL_API_PORT}/predict",
+                "http://model-api:{MODEL_API_PORT}/predict",
                 json=data,
                 timeout=5.0
             ) as response:
@@ -231,8 +237,24 @@ async def show_results(message: types.Message, state: FSMContext):
 
 
 
-async def main(): 
-    await dp.start_polling(bot)
+async def main():
+    
+    webhook_url = f"https://{DOMAIN}/webhook/{TELEGRAM_BOT_TOKEN}"
+    
+    app = web.Application()
+    SimpleRequestHandler(dispatcher=dp, bot=bot).register(app, path=f"/webhook/{TELEGRAM_BOT_TOKEN}")
+    
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '0.0.0.0', TELEGRAM_BOT_PORT) 
+    await site.start()
+    
+    logger.info(f"Сервер запущен на 0.0.0.0:{TELEGRAM_BOT_PORT}")
+    
+    await bot.set_webhook(webhook_url)
+    logger.info(f"Webhook установлен: {webhook_url}")
+    
+    await asyncio.Event().wait()
 
 if __name__ == "__main__":
     import asyncio

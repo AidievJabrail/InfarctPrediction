@@ -4,7 +4,10 @@ from catboost import CatBoostClassifier
 import sqlite3
 import numpy as np
 import logging
-from config import MODEL_API_PORT, MODEL_PATH, DATABASE_PATH
+import os
+
+MODEL_API_PORT= int(os.getenv('MODEL_API_PORT'))
+
 
 
 logging.basicConfig(level=logging.INFO)
@@ -14,7 +17,7 @@ app = FastAPI(title="CatBoost Prediction API")
 
 try:
     model = CatBoostClassifier()
-    model.load_model(MODEL_PATH)
+    model.load_model('./ModelApi/catboost.cbm')
     logger.info("CatBoost model loaded successfully")
 except Exception as e:
     logger.error(f"Error loading model: {e}")
@@ -62,7 +65,7 @@ FEATURE_ORDER = [
 ]
 
 def save_prediction_to_db(user_data: dict, prediction_result: int):
-    conn = sqlite3.connect(DATABASE_PATH)
+    conn = sqlite3.connect('./ModelApi/logger.db')
     cursor = conn.cursor()
     
     cursor.execute('''

@@ -1,20 +1,47 @@
-version: '3.8'
-
 services:
-  ml-api:
+  model-api:
     build: .
-    container_name: ml-api-container
-    ports:
-      - "8000:8000"
-    command: python model_api.py
+    container_name: model-api-container
+    command: python ModelApi/model_api.py
+    env_file:
+      - .env
     volumes:
       - .:/app
+    networks:
+      - app-network
 
   telegram-bot:
     build: .
     container_name: telegram-bot-container
-    depends_on:
-      - ml-api
-    command: python telegram_bot.py
+    command: python TelegramBot/telegram_bot.py
+    env_file:
+      - .env
     volumes:
       - .:/app
+    depends_on:
+      - model-api
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:1.24-alpine 
+    container_name: nginx-proxy
+    env_file:
+      - .env
+    ports:
+      - "80:80"    
+      - "443:443"
+    volumes:
+      - ./nginx/ssl:/etc/nginx/ssl
+      - ./nginx/templates:/etc/nginx/templates
+      - ./nginx/nginx.conf:/nginx.conf   
+ 
+    depends_on:
+      - telegram-bot
+      - model-api
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
