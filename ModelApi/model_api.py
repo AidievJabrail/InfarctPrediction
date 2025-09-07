@@ -13,7 +13,12 @@ MODEL_API_PORT= int(os.getenv('MODEL_API_PORT'))
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="CatBoost Prediction API")
+app = FastAPI(
+    docs_url="/docs",
+    openapi_url="/openapi.json",
+    root_path="/model-api",  
+    title="CatBoost Prediction API",
+    )
 
 try:
     model = CatBoostClassifier()
