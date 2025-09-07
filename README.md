@@ -149,13 +149,18 @@ docker-compose down
 
 ### 5. Проверка работы FastApi
 
-<https://yourdomain.ru/model-api/predict> - предсказания модели. Для предсказания отправляется POST запрос с json файлом в теле.
+<https://yourdomain.ru/model-api/predict> - путь для предсказания модели. Отправляется POST запрос с json файлом в теле. Ответ приходит в поле predict.
+
+```text
+1 - Высокий риск инфаркта
+2 - Низкий риск инфаркта
+```
 
 <https://yourdomain.ru/model-api/docs> - автоматическая документация API.
 
 ### 6. Проверка работы Телеграм-бота
 
-```
+```text
 Найдите вашего бота в Telegram.
 Начните диалог командой /start.
 Для начало опроса /survey.
@@ -164,15 +169,13 @@ docker-compose down
 
 ### 🛠 Технологический стек
 
-*   **Backend**: Python 3.10, FastAPI, Uvicorn
-*   **Machine Learning**: CatBoost, Scikit-learn, Pandas, NumPy
-*   **Telegram Bot**: Aiogram, Asyncio
-*   **Database**: SQLite3
-*   **Web Server**: Nginx
-*   **Containerization**: Docker, Docker Compose
-*   **Security**: SSL, HTTPS
-
-
+* **Backend**: Python 3.10, FastAPI, Uvicorn
+* **Machine Learning**: CatBoost, Scikit-learn, Pandas, NumPy
+* **Telegram Bot**: Aiogram, Asyncio
+* **Database**: SQLite3
+* **Web Server**: Nginx
+* **Containerization**: Docker, Docker Compose
+* **Security**: SSL, HTTPS
 
 ### ⚠️ Важное примечание
 
@@ -186,4 +189,4 @@ docker-compose down
 
 **Джабраил Айдиев**: <dzabrail.aidiev@mail.ru>
 
-**Ссылка на проект**: https://github.com/AidievJabrail/InfarctPrediction
+**Ссылка на проект**: <https://github.com/AidievJabrail/InfarctPrediction>
