@@ -11,9 +11,9 @@
 
 **Готовый бот:** [@heartcorbot](https://t.me/heartcorbot) в Telegram.
 
-**Готовый API:** [протестировать в Postman](https://www.postman.com/aidievjabrail-1402364/workspace/github/request/47712792-7c843c1e-6840-4b8b-ba32-cc807dbdcbb8?action=share&source=copy-link&creator=47712792)
+**Готовый API:** [Протестировать в Postman](https://www.postman.com/aidievjabrail-1402364/workspace/github/request/47712792-7c843c1e-6840-4b8b-ba32-cc807dbdcbb8?action=share&source=copy-link&creator=47712792)
 
-**Документация к API:** [документация](https://makemlbehappy.ru/model-api/docs)
+**Документация к API:** [Документация](https://makemlbehappy.ru/model-api/docs)
 
 ## 🚀 Возможности
 
