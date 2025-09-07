@@ -1,0 +1,47 @@
+services:
+  model-api:
+    build: .
+    container_name: model-api-container
+    command: sh -c "python init_db.py && python model_api.py"
+    env_file:
+      - .env
+    volumes:
+      - ./ModelApi:/app
+    networks:
+      - app-network
+
+  telegram-bot:
+    build: .
+    container_name: telegram-bot-container
+    command: python telegram_bot.py
+    env_file:
+      - .env
+    volumes:
+      - ./TelegramBot:/app
+    depends_on:
+      - model-api
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:1.24-alpine 
+    container_name: nginx-proxy
+    env_file:
+      - .env
+    ports:
+      - "80:80"    
+      - "443:443"
+    volumes:
+      - ./Nginx/ssl:/etc/nginx/ssl
+      - ./Nginx/templates:/etc/nginx/templates
+      - ./Nginx/nginx.conf:/nginx.conf   
+ 
+    depends_on:
+      - telegram-bot
+      - model-api
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

@@ -1,0 +1,7 @@
+.env
+__pycache__
+logger.db
+.venv
+.vscode
+privkey.pem
+fullchain.pem
