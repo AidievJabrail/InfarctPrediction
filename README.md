@@ -1,4 +1,4 @@
-# 🤖 Infarct Prediction Bot ❤️
+# 🤖 ML-прогноз инфаркта 🫀
 
 [![Telegram](https://img.shields.io/badge/Telegram-Bot-blue?logo=telegram)](https://t.me/heartcorbot)
 [![FastAPI](https://img.shields.io/badge/FastAPI-API-green?logo=fastapi)](https://makemlbehappy.ru/model-api/docs)
